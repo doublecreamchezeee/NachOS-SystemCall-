@@ -563,17 +563,27 @@ void ExceptionHandler(ExceptionType which)
 			// Input id cua file(OpenFileID)
 			// Output: 0: thanh cong, -1 that bai
 			int fid = kernel->machine->ReadRegister(4); // Lay id cua file tu thanh ghi so 4
-			if (fid >= 0 && fid <= 14)					// Chi xu li khi fid nam trong [0, 14]
-			{
-				if (kernel->fileSystem->openf[fid]) // neu mo file thanh cong
-				{
-					delete kernel->fileSystem->openf[fid]; // Xoa vung nho luu tru file
-					kernel->fileSystem->openf[fid] = NULL; // Gan vung nho NULL
-					kernel->machine->WriteRegister(2, 0);
-					break;
-				}
+			// if (fid >= 0 && fid <= 14)					// Chi xu li khi fid nam trong [0, 14]
+			// {
+			// 	if (kernel->fileSystem->openf[fid]) // neu mo file thanh cong
+			// 	{
+			// 		delete kernel->fileSystem->openf[fid]; // Xoa vung nho luu tru file
+			// 		kernel->fileSystem->openf[fid] = NULL; // Gan vung nho NULL
+			// 		kernel->machine->WriteRegister(2, 0);
+			// 		break;
+			// 	}
+			// }
+			if (!table.isEmpty()){
+				DEBUG(dbgSys, "Closed file!\n");
+				table.closeFile(fid);
+				kernel->machine->WriteRegister(2, 0);
+				increaseProgramCounter();
+				DEBUG(dbgSys, "Closed file succesful!\n");
+				return;	
+				ASSERTNOTREACHED();
+				break;
 			}
-			DEBUG(dbgSys, "Closed file!\n");
+			DEBUG(dbgSys, "Closed file fail!\n");
 			kernel->machine->WriteRegister(2, -1);
 			increaseProgramCounter();
 			return;
